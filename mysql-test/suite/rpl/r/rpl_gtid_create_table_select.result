@@ -1,0 +1,47 @@
+include/master-slave.inc
+[connection master]
+include/rpl_set_gtid_mode.inc
+
+Validate env
+------------
+show variables like 'gtid_mode';
+Variable_name	Value
+gtid_mode	ON
+show variables like 'enforce_gtid_consistency';
+Variable_name	Value
+enforce_gtid_consistency	ON
+show variables like 'gtid_next';
+Variable_name	Value
+gtid_next	AUTOMATIC
+show variables like 'gtid_mode';
+Variable_name	Value
+gtid_mode	ON
+
+Setup data
+----------
+create table t1(c1 int);
+insert into t1(c1) values (1),(2),(3);
+include/rpl_sync.inc
+
+Test 1: CTS is allowed
+----------------------
+create table t2(c1 int) select * from t1;
+include/rpl_sync.inc
+select * from t2;
+c1
+1
+2
+3
+
+Test 2: CTS blocked for tmp table in a transaction
+--------------------------------------------------
+begin;
+create temporary table tt(c1 int) select * from t1;
+ERROR HY000: When @@GLOBAL.ENFORCE_GTID_CONSISTENCY = 1, the statements CREATE TEMPORARY TABLE and DROP TEMPORARY TABLE can be executed in a non-transactional context only, and require that AUTOCOMMIT = 1. These statements are also not allowed in a function or trigger because functions and triggers are also considered to be multi-statement transactions.
+rollback;
+
+Clean up
+--------
+drop table t2;
+drop table t1;
+include/rpl_end.inc

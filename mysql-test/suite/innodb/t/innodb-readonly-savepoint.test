@@ -1,0 +1,38 @@
+#
+# Test Innodb savepoint when the server is in read-only mode.
+# This issue was caught during stress testing so we should
+# have a standalone test case for it.
+#
+--source include/have_debug.inc
+--source include/have_innodb.inc
+# Embedded server does not support restarting.
+--source include/not_embedded.inc
+
+--echo #
+--echo # 1. Create table and insert a row
+--echo # 2. Restart server in read-only mode
+--echo # 3. Run a transaction:
+--echo #      - begin
+--echo #      - select from table
+--echo #      - create savepoint
+--echo #      - commit
+
+BEGIN;
+CREATE TABLE t1(c1 INT) ENGINE= InnoDB;
+INSERT INTO t1 VALUES (100);
+COMMIT;
+
+--echo # Shutdown and restart the server with --innodb-read-only=1
+--exec echo "wait" > $MYSQLTEST_VARDIR/tmp/mysqld.1.expect
+--shutdown_server
+--source include/wait_until_disconnected.inc
+
+--enable_reconnect
+--exec echo "restart:--innodb-read-only=1" > $MYSQLTEST_VARDIR/tmp/mysqld.1.expect
+--source include/wait_until_connected_again.inc
+
+BEGIN;
+SELECT * FROM t1;
+SAVEPOINT SP1;
+COMMIT;
+

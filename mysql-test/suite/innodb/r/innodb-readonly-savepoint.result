@@ -1,0 +1,19 @@
+#
+# 1. Create table and insert a row
+# 2. Restart server in read-only mode
+# 3. Run a transaction:
+#      - begin
+#      - select from table
+#      - create savepoint
+#      - commit
+BEGIN;
+CREATE TABLE t1(c1 INT) ENGINE= InnoDB;
+INSERT INTO t1 VALUES (100);
+COMMIT;
+# Shutdown and restart the server with --innodb-read-only=1
+BEGIN;
+SELECT * FROM t1;
+c1
+100
+SAVEPOINT SP1;
+COMMIT;

@@ -1,0 +1,12 @@
+SHOW STATUS LIKE 'Ssl_cipher';
+Variable_name	Value
+Ssl_cipher	DHE-RSA-AES256-SHA
+SHOW STATUS LIKE 'Rsa_public_keys';
+Variable_name	Value
+SET @@SESSION.net_read_timeout = 1;
+show variables like 'net_read_timeout';
+Variable_name	Value
+net_read_timeout	1
+select 1;
+1
+1

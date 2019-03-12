@@ -1,0 +1,32 @@
+# It was found that with YASSL and the tread pool plugin, clients connecting
+# with SSL would timeout after net_read_timeout seconds. This is the wrong
+# timeout value for this behaviour. It should be the wait_timeout.
+# The problem stemmed from YASSL. When using OpenSSL this does not happen.
+
+--source include/have_pool_of_threads.inc
+--source include/have_ssl_communication.inc
+--source include/have_openssl_linked.inc
+
+# Save the initial number of concurrent sessions
+--source include/count_sessions.inc
+
+connect (ssl_con,localhost,root,,,,,SSL);
+--disable_reconnect
+
+# Check ssl turned on
+SHOW STATUS LIKE 'Ssl_cipher';
+# Check that OpenSSL is installed (this var only exists with OpenSSL)
+SHOW STATUS LIKE 'Rsa_public_keys';
+
+SET @@SESSION.net_read_timeout = 1;
+show variables like 'net_read_timeout';
+sleep 3;
+# At this point the connection would be timedout, however not indication would
+# be given until another command is issued.
+select 1;
+
+connection default;
+disconnect ssl_con;
+
+# Wait till all disconnects are completed
+--source include/wait_until_count_sessions.inc

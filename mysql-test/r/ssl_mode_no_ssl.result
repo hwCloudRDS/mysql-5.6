@@ -1,0 +1,23 @@
+# negative client tests
+# mysql
+ERROR 2026 (HY000): SSL connection error: Server doesn't support SSL
+ERROR 2026 (HY000): SSL connection error: Server doesn't support SSL
+ERROR 2026 (HY000): SSL connection error: Server doesn't support SSL
+ERROR 2026 (HY000): SSL connection error: Server doesn't support SSL
+# mysqldump
+mysqldump: Got error: 2026: SSL connection error: Server doesn't support SSL when trying to connect
+# mysqladmin
+Warning: Using a password on the command line interface can be insecure.
+mysqladmin: error: 'SSL connection error: Server doesn't support SSL'
+# mysqlcheck
+mysqlcheck: Got error: 2026: SSL connection error: Server doesn't support SSL when trying to connect
+# mysqlimport
+mysqlimport: Error: 2026 SSL connection error: Server doesn't support SSL
+# mysqlshow
+mysqlshow: SSL connection error: Server doesn't support SSL
+# mysqlslap
+mysqlslap: Error when connecting to server: SSL connection error: Server doesn't support SSL
+# mysqltest
+mysqltest: Could not open connection 'default': 2026 SSL connection error: Server doesn't support SSL
+
+End of tests
